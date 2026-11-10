@@ -11,3 +11,4 @@ langchain-chroma>=0.1.4
 langgraph>=0.2.35
 langfuse>=2.50.0
 gunicorn>=21.2.0
+gunicorn
