@@ -1,0 +1,10 @@
+.env
+*.db
+chroma_compliance_db/
+fraud/
+Lib/
+Scripts/
+Include/
+pyvenv.cfg
+__pycache__/
+*.pyc

@@ -1,0 +1,75 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "2a46ba16-60ed-4e05-822f-1eea71d8c118",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "version: '3.8'\n",
+    "\n",
+    "services:\n",
+    "  # Service 1: The Core Compliance HTTP Scoring Server Node\n",
+    "  forensic-engine:\n",
+    "    build:\n",
+    "      context: .\n",
+    "      dockerfile: Dockerfile\n",
+    "    container_name: forensic_engine_container\n",
+    "    ports:\n",
+    "      - \"8080:8080\"\n",
+    "    volumes:\n",
+    "      - ./data:/app/data\n",
+    "    environment:\n",
+    "      - ENGINE_PORT=8080\n",
+    "      - LOG_LEVEL=INFO\n",
+    "    networks:\n",
+    "      - forensic-network\n",
+    "    restart: unless-stopped\n",
+    "\n",
+    "  # Service 2: Automated Pipeline Ingestion Test Harness\n",
+    "  fde-test-harness:\n",
+    "    build:\n",
+    "      context: .\n",
+    "      dockerfile: Dockerfile\n",
+    "    container_name: fde_test_harness_container\n",
+    "    # Wait for the server node socket to map cleanly, then run the upload macro utility\n",
+    "    command: >\n",
+    "      sh -c \"echo 'Waiting for core forensic server node to mount...' && \n",
+    "             sleep 4 && \n",
+    "             python app.py --test-upload\"\n",
+    "    environment:\n",
+    "      - BACKEND_URL=http://forensic-engine:8080\n",
+    "    depends_on:\n",
+    "      - forensic-engine\n",
+    "    networks:\n",
+    "      - forensic-network\n",
+    "\n",
+    "networks:\n",
+    "  forensic-network:\n",
+    "    driver: bridge\n"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.11.7"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
